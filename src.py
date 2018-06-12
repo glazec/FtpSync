@@ -3,6 +3,7 @@ from ftplib import error_perm
 import os
 import shutil
 import auxiliary
+import time
 
 class FtpSync(object):
     def __init__(self):
@@ -25,11 +26,12 @@ class FtpSync(object):
         except Exception as e:
             print("try again later")
 
-
     def __del__(self):
         self.ftp.close()
 
     def syncSingleDir(self,nowdir):
+        self.cwd = "/"
+
         # compare dir
         # compare file(extra or lack)
         # downlaod file(auxiliary)
@@ -40,6 +42,8 @@ class FtpSync(object):
         # for i,j,k in os.walk(os.path.join(self.rootDir,nowdir),topdown=False):
         #     self.localDir.append(j)
         #     self.localFile.append(k)
+
+        # update local index
         for i in os.listdir(os.path.join(self.rootDir,nowdir)):
             if os.path.isdir(i):
                 self.localDir.append(i)
@@ -47,6 +51,8 @@ class FtpSync(object):
                 self.localFile.append(i)
 
         self.ftp.cwd(nowdir)
+
+        # update remote index
         temp = self.ftp.nlst()
         for i in temp:
             if self.isdir(i):
@@ -54,27 +60,31 @@ class FtpSync(object):
             else:
                 self.remoteFile.append(i)
 
+        # sync new dir
         for i in self.remoteDir:
             if i in self.localDir:
                 pass
             else:
                 os.mkdir(os.path.join(self.rootDir,nowdir,i))
 
-        for i in self.localDir:
-            if i in self.remoteDir:
-                pass
-            else:
-                a = os.path.join(self.rootDir,nowdir)
-                a = os.path.join(a,i)
-                shutil.rmtree(a)
+        # rm extra dir
+        # for i in self.localDir:
+        #     if i in self.remoteDir:
+        #         pass
+        #     else:
+        #         a = os.path.join(self.rootDir,nowdir)
+        #         a = os.path.join(a,i)
+        #         shutil.rmtree(a)
 
+        # sync new file
         for i in self.remoteFile:
             if i in self.localFile:
                 pass
             else:
                 b = os.path.join(self.rootDir,nowdir)
                 self.download(i,b)
-        
+
+        # remove extra file
         for i in self.localFile:
             if i in self.remoteFile or i in "src.py" or i in "auxiliary.py": #delete condition
                 pass
@@ -84,11 +94,13 @@ class FtpSync(object):
                 os.remove(b)
                 print("remove "+i)
 
+        # update outdated file
         for i in os.listdir(os.path.join(self.rootDir,nowdir)):
-            if os.path.isdir(i) or i == "auxiliary.py" or i == "src.py": # delete condition
+            if os.path.isdir(i) or i == "auxiliary.py" or i == "src.py" or i == "updater.exe": # delete condition
                 pass
             else:
                 self.comparesize(nowdir,i)
+        self.ftp.cwd(self.cwd)
 
     def isdir(self,fileOrDir):
         try:
@@ -97,7 +109,6 @@ class FtpSync(object):
             return True
         except error_perm as e:
             return False
-
 
     def download(self,filen,absnowdir):
         a = os.path.join(absnowdir,filen)
@@ -114,7 +125,10 @@ class FtpSync(object):
             self.download(filname,a)
 
 if __name__ == '__main__':
-    #erep=FtpSync()
+    # erep=FtpSync()
     ere = FtpSync()
-    #erep.syncSingleDir("")
+    ere.syncSingleDir("")
+    # print("finish ")
+    # time.sleep()
     ere.syncSingleDir("addons/")
+    ere.syncSingleDir("optional/")
