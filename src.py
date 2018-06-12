@@ -8,8 +8,8 @@ import auxiliary
 class FtpSync(object):
     def __init__(self):
         self.ftp = FTP()
-        self.ip = auxiliary.ip()
-        self.port = auxiliary.port()
+        self.ip = auxiliary.server()[0]
+        self.port = auxiliary.server()[1]
         self.localFile = []
         self.localDir = []
         self.remoteDir = []
