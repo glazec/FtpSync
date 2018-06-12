@@ -7,8 +7,9 @@ import auxiliary
 class FtpSync(object):
     def __init__(self):
         self.ftp = FTP()
-        self.ip = auxiliary.server()[0]
-        self.port = auxiliary.port()[1]
+        a = auxiliary.server()
+        self.ip = a[0]
+        self.port = a[1]
         self.localFile = []
         self.localDir = []
         self.remoteDir = []
@@ -73,6 +74,7 @@ class FtpSync(object):
             else:
                 b = os.path.join(self.rootDir,nowdir)
                 self.download(i,b)
+        
         for i in self.localFile:
             if i in self.remoteFile or i in "src.py" or i in "auxiliary.py": #delete condition
                 pass
@@ -80,6 +82,7 @@ class FtpSync(object):
                 b = os.path.join(self.rootDir,nowdir)
                 b = os.path.join(b,i)
                 os.remove(b)
+                print("remove "+i)
 
         for i in os.listdir(os.path.join(self.rootDir,nowdir)):
             if os.path.isdir(i) or i == "auxiliary.py" or i == "src.py": # delete condition
@@ -97,17 +100,21 @@ class FtpSync(object):
 
 
     def download(self,filen,absnowdir):
-       a = os.path.join(absnowdir,filen)
-       self.ftp.retrbinary("RETR "+filen,open(a,'wb').write)
+        a = os.path.join(absnowdir,filen)
+        self.ftp.retrbinary("RETR "+filen,open(a,'wb').write)
+        print("finished downlaoding "+ filen+" into "+ absnowdir)
 
     def comparesize(self,nowdir,filname):
         a = os.path.join(self.rootDir,nowdir)
         b = os.path.join(a,filname)
-        if os.path.getsize(b) != self.ftp.size(os.path.join(nowdir,filname)):
+        c = os.path.join(nowdir,filname)
+        #if os.path.getsize(b) != self.ftp.size(os.path.join(nowdir,filname)):
+        if os.path.getsize(b)!= self.ftp.size(filname):
             os.remove(b)
             self.download(filname,a)
 
 if __name__ == '__main__':
-    erep=FtpSync()
-    erep.syncSingleDir("")
-    del erep
+    #erep=FtpSync()
+    ere = FtpSync()
+    #erep.syncSingleDir("")
+    ere.syncSingleDir("addons/")
