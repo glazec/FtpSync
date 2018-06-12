@@ -1,5 +1,3 @@
-from ftplib import FTP
-import shutil
 import leancloud
 
 def server():

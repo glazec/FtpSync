@@ -108,3 +108,11 @@ venv.bak/
 
 #pycharm
 .idea
+
+#pyinstaller
+/dist
+/build
+/__pycache
+*.spec
+
+/serverchange
