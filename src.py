@@ -138,6 +138,10 @@ class FtpSync(object):
             self.download(filname,a)
 
 if __name__ == '__main__':
+    print("+++++++++++++++++++++++++++++++++++")
+    print("2erep updater made by 2erep 琉璃\nFor source code,please visit https://github.com/kismet-cruz/FtpSync")
+    print("Last updated 2018.06.14")
+    print("+++++++++++++++++++++++++++++++++++")
     # erep=FtpSync()
     ere = FtpSync()
     ere.syncSingleDir("")
@@ -146,4 +150,4 @@ if __name__ == '__main__':
     # ere.syncSingleDir("addons/")
     #ere.syncSingleDir("optional/")
 
-    # todo refresh self.resources
+    # update itself
