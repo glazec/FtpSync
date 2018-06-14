@@ -45,7 +45,7 @@ class FtpSync(object):
 
         # update local index
         for i in os.listdir(os.path.join(self.rootDir,nowdir)):
-            if os.path.isdir(i):
+            if os.path.isdir(os.path.join(os.path.join(self.rootDir,nowdir),i)):
                 self.localDir.append(i)
             else:
                 self.localFile.append(i)
@@ -66,15 +66,17 @@ class FtpSync(object):
                 pass
             else:
                 os.mkdir(os.path.join(self.rootDir,nowdir,i))
+                self.localDir.append(i)
 
         # rm extra dir
-        # for i in self.localDir:
-        #     if i in self.remoteDir:
-        #         pass
-        #     else:
-        #         a = os.path.join(self.rootDir,nowdir)
-        #         a = os.path.join(a,i)
-        #         shutil.rmtree(a)
+        for i in self.localDir:
+            if i in self.remoteDir or i=="__pycache__":
+                pass
+            else:
+                a = os.path.join(self.rootDir,nowdir)
+                a = os.path.join(a,i)
+                shutil.rmtree(a)
+                print("remove "+a)
 
         # sync new file
         for i in self.remoteFile:
@@ -83,6 +85,7 @@ class FtpSync(object):
             else:
                 b = os.path.join(self.rootDir,nowdir)
                 self.download(i,b)
+                self.localFile.append(i)
 
         # remove extra file
         for i in self.localFile:
@@ -92,6 +95,7 @@ class FtpSync(object):
                 b = os.path.join(self.rootDir,nowdir)
                 b = os.path.join(b,i)
                 os.remove(b)
+                self.localFile.remove(i)
                 print("remove "+i)
 
         # update outdated file
@@ -101,6 +105,15 @@ class FtpSync(object):
             else:
                 self.comparesize(nowdir,i)
         self.ftp.cwd(self.cwd)
+        self.localFile = []
+        self.remoteFile = []
+
+        for i in self.remoteDir:
+            if i!="__pycache":
+                self.remoteDir.remove(i)
+                self.localDir.remove(i)
+                self.syncSingleDir(i)
+
 
     def isdir(self,fileOrDir):
         try:
@@ -130,5 +143,7 @@ if __name__ == '__main__':
     ere.syncSingleDir("")
     # print("finish ")
     # time.sleep()
-    ere.syncSingleDir("addons/")
-    ere.syncSingleDir("optional/")
+    # ere.syncSingleDir("addons/")
+    #ere.syncSingleDir("optional/")
+
+    # todo refresh self.resources
